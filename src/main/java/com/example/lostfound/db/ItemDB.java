@@ -1,9 +1,7 @@
 package com.example.lostfound.db;
 
 import jakarta.persistence.*;
-enum LOSTSTATUS {
-    LOST,STATUS
-}
+
 @Entity
 public class ItemDB {
     @Id
@@ -11,8 +9,20 @@ public class ItemDB {
     private Long id;
     LOSTSTATUS itemStatus;
     String description;
-    String locationFound;
+    String location;
     String itemName;
+
+    public ItemDB(LOSTSTATUS itemStatus, String description, String location, String itemName, Long userid) {
+        this.itemStatus = itemStatus;
+        this.description = description;
+        this.location = location;
+        this.itemName = itemName;
+        this.userid = userid;
+    }
+
+    public ItemDB() {
+
+    }
 
     public String getItemName() {
         return itemName;
@@ -21,7 +31,7 @@ public class ItemDB {
         this.itemName = itemName;
     }
 
-    private String userid;
+    private Long userid;
     public Long getId() {
         return id;
     }
@@ -34,11 +44,11 @@ public class ItemDB {
         return description;
     }
 
-    public String getLocationFound() {
-        return locationFound;
+    public String getLocation() {
+        return location;
     }
 
-    public String getUserid() {
+    public Long getUserid() {
         return userid;
     }
 }

@@ -5,13 +5,15 @@ import com.example.lostfound.AppStrings;
 import com.example.lostfound.LostAndFoundException;
 import com.example.lostfound.db.ItemDB;
 import com.example.lostfound.dto.GeneralResponseDTO;
+import com.example.lostfound.dto.ItemDTO;
+import com.example.lostfound.dto.validation.OnCreate;
 import com.example.lostfound.repository.ItemRepository;
+import com.example.lostfound.repository.UserRepository;
 import com.example.lostfound.services.Utils;
-import org.apache.coyote.http2.HpackDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,16 +22,21 @@ public class ItemController {
 
     @Autowired
     private ItemRepository itemRepository;
-    
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/")
     public ResponseEntity<String> getSomething(){
         return ResponseEntity.ok().body("I am ok");
     }
     
     @PostMapping("/")
-    public ResponseEntity<GeneralResponseDTO<ItemDB>> addItem(@RequestBody ItemDB item) throws Throwable {
+    public ResponseEntity<GeneralResponseDTO<ItemDB>> addItem(@Validated(OnCreate.class) @RequestBody ItemDTO item) {
+        if (!userRepository.existsById(item.getUserid())){
+            throw new LostAndFoundException(AppStrings.userNotFound);
+        }
         try {
-          var newItem=  itemRepository.save(item);
+          var newItem=  itemRepository.save(new ItemDB(item.getItemStatus(),item.getDescription(),item.getLocation(),item.getName(),item.getUserid()));
            var getItemFromDB=itemRepository.existsById(newItem.getId());
            if (getItemFromDB) {
                return Utils.returnResponse(HttpStatus.CREATED,newItem,AppStrings.itemCreated);
