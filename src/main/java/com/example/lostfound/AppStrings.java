@@ -5,4 +5,11 @@ public class AppStrings {
     public static String itemCreated="item created";
     public static String failedToCreate="Failed To create";
     public static String userCreated="user created";
+    public static String userFound="user found";
+
+    public static String userDeleted="user deleted";
+    public static String failedToUpdate="failed to update";
+    public static String userUpdated="user updated";
+    public static String userNotFound="user not found";
+    public static String failedToDelete="failed to delete";
 }

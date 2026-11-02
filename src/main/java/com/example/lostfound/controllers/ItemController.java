@@ -7,6 +7,7 @@ import com.example.lostfound.db.ItemDB;
 import com.example.lostfound.dto.GeneralResponseDTO;
 import com.example.lostfound.repository.ItemRepository;
 import com.example.lostfound.services.Utils;
+import org.apache.coyote.http2.HpackDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ItemController {
     }
     
     @PostMapping("/")
-    public ResponseEntity<GeneralResponseDTO<ItemDB>> addItem(@RequestBody ItemDB item) {
+    public ResponseEntity<GeneralResponseDTO<ItemDB>> addItem(@RequestBody ItemDB item) throws Throwable {
         try {
           var newItem=  itemRepository.save(item);
            var getItemFromDB=itemRepository.existsById(newItem.getId());
@@ -35,12 +36,13 @@ public class ItemController {
 
            }
            else {
-               LostAndFoundException lostAndFoundException = new LostAndFoundException(AppStrings.itemCreated);ResponseEntity.status(HttpStatus.CREATED).body(new GeneralResponseDTO<>(HttpStatus.CREATED, AppStrings.itemCreated, newItem));
-           throw lostAndFoundException;
+               return Utils.returnResponse(HttpStatus.CONFLICT,null,AppStrings.failedToCreate);
+
            }
         }
         catch (Exception e) {
-            throw new LostAndFoundException(e.getMessage());
+
+            throw new Throwable(e.getMessage());
         }
 
     }
