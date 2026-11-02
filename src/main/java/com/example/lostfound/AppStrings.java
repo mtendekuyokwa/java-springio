@@ -15,4 +15,6 @@ public class AppStrings {
     public static String failedToGetAll="failed to get all";
     public static String allItemsRetrieved="all items retrieved";
     public static String deleteConfirmed="delete confirmed";
+    public static String failetoPatch="failed to patch";
+    public static String dataUpated="data updated";
 }

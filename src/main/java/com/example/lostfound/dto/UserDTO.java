@@ -2,21 +2,23 @@ package com.example.lostfound.dto;
 
 import com.example.lostfound.dto.validation.OnCreate;
 import com.example.lostfound.dto.validation.OnUpdate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 
 public class UserDTO {
 
-    @NotBlank(message = "username cannot be blank",groups = {OnCreate.class, OnUpdate.class})
+    @NotBlank(message = "username cannot be blank",groups = {OnCreate.class})
     @Size(min = 2, max = 100,message = "username too short",groups = {OnCreate.class, OnUpdate.class})
     String username;
 
 
     Long id;
-    @NotBlank(message = "password cannot be blank",groups = {OnCreate.class, OnUpdate.class})
+    @JsonIgnore
+    @NotBlank(message = "password cannot be blank",groups = {OnCreate.class})
             @Size(min = 8,max = 100,message = "password too short",groups =  {OnCreate.class, OnUpdate.class})
-    String password;
+     String password;
 
     public UserDTO(String username, Long id) {
         this.username = username;

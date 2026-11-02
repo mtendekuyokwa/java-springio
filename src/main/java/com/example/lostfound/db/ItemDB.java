@@ -1,6 +1,7 @@
 package com.example.lostfound.db;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
 @Entity
 public class ItemDB {
@@ -12,7 +13,15 @@ public class ItemDB {
     String location;
     String itemName;
     Category category;
+    RecoveryStatus  recoveryStatus=RecoveryStatus.UNRECOVERED;
 
+    public RecoveryStatus getRecoveryStatus() {
+        return recoveryStatus;
+    }
+
+    public void setRecoveryStatus(RecoveryStatus recoveryStatus) {
+        this.recoveryStatus = recoveryStatus;
+    }
 
     public ItemDB(LOSTSTATUS itemStatus, String description, String location, String itemName, Long userid, Category category) {
         this.itemStatus = itemStatus;

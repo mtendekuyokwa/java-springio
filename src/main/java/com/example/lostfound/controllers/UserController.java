@@ -41,19 +41,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new GeneralResponseDTO<>(HttpStatus.CONFLICT, AppStrings.failedToCreate, null));
     }
 @PutMapping("/{id}")
-ResponseEntity<GeneralResponseDTO<UserDTO>> updateUser(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody UserDTO userDB) {
+ResponseEntity<GeneralResponseDTO<UserDTO>> updateUser(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody UserDTO newuser) {
 
             var user=userRepository.findById(id).map(existingProduct->{
-                existingProduct.setUsername(userDB.getUsername());
-                existingProduct.setPassword(userDB.getUsername());
+                existingProduct.setUsername(newuser.getUsername());
+                existingProduct.setPassword(newuser.getPassword());
                 userRepository.save(existingProduct);
                 return Utils.returnResponse(HttpStatus.OK,new UserDTO(existingProduct.getUsername(), existingProduct.getId()),AppStrings.userUpdated);
-            }).orElse(Utils.returnResponse(HttpStatus.NOT_FOUND,  null,AppStrings.failedToUpdate));
+            }).orElse(Utils.returnResponse(HttpStatus.CONFLICT,  null,AppStrings.failedToUpdate));
 
 
 
-        return Utils.returnResponse(HttpStatus.CONFLICT,null,AppStrings.failedToUpdate);
+    return user;
+
 }
+
 @DeleteMapping("/{id}")
 ResponseEntity<GeneralResponseDTO<String>>  deleteUser(@PathVariable Long id){
         try {

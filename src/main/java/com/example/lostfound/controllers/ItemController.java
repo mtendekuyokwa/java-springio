@@ -4,8 +4,10 @@ package com.example.lostfound.controllers;
 import com.example.lostfound.AppStrings;
 import com.example.lostfound.LostAndFoundException;
 import com.example.lostfound.db.ItemDB;
+import com.example.lostfound.db.RecoveryStatus;
 import com.example.lostfound.dto.GeneralResponseDTO;
 import com.example.lostfound.dto.ItemDTO;
+import com.example.lostfound.dto.RecoveryDTO;
 import com.example.lostfound.dto.validation.OnCreate;
 import com.example.lostfound.repository.ItemRepository;
 import com.example.lostfound.repository.UserRepository;
@@ -51,6 +53,20 @@ public class ItemController {
             throw  new LostAndFoundException(AppStrings.failedToDelete);
         }
 
+    }
+    @PutMapping("/{id}/recover")
+    public ResponseEntity<GeneralResponseDTO<ItemDTO>> modifyItem(@PathVariable Long id, @RequestBody RecoveryDTO recoveryStatus){
+        try {
+          var item=  itemRepository.findById(id).map(itemDB -> {
+                itemDB.setRecoveryStatus(recoveryStatus.getRecoveryStatus());
+            itemRepository.save(itemDB);
+            return Utils.returnResponse(HttpStatus.OK,new ItemDTO(itemDB.getItemName(),itemDB.getId(),itemDB.getDescription(),itemDB.getItemStatus(),itemDB.getLocation(),itemDB.getUserid(),itemDB.getCategory()),AppStrings.dataUpated);
+            }).orElse(Utils.returnResponse(HttpStatus.CONFLICT,null,AppStrings.failedToUpdate));
+return item;
+        }
+        catch (Exception e) {
+            throw new LostAndFoundException(AppStrings.failetoPatch);
+        }
     }
     
     @PostMapping("/")

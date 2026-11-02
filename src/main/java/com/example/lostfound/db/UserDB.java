@@ -29,7 +29,8 @@ public class UserDB {
         this.username = username;
     }
 
-
+    public UserDB() {
+    }
 
     public void setPassword(String password) {
         this.password = password;
