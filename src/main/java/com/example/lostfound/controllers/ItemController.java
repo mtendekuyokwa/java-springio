@@ -71,15 +71,15 @@ return item;
         }
     }
 
-    @GetMapping("search/")
+    @GetMapping("search")
     public ResponseEntity<GeneralResponseDTO<List<ItemDB>>> searchItem(
             @RequestParam(defaultValue = "%") String location,
-            @RequestParam(defaultValue = "%") Category category,
+            @RequestParam(defaultValue = "ALL") Category category,
             @RequestParam (defaultValue = "%") String name
     ){
 try {
     //TODO: convert the itemdb to itemdto
-var items=itemRepository.getByNameLocationAndCategory(name,location,(Category) category);
+var items=itemRepository.getByNameLocationAndCategory(name,location, category==Category.ALL?null:category);
 return Utils.returnResponse(HttpStatus.OK,items,AppStrings.allItemsRetrieved);
 }
 catch (Exception e) {

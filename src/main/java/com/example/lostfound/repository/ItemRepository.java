@@ -9,7 +9,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<ItemDB, Long> {
-    @Query(value = "SELECT i FROM ItemDB i WHERE i.itemName LIKE :itemname AND i.location LIKE :location AND i.category = :category")
+    @Query(value = "SELECT i FROM ItemDB i WHERE i.itemName LIKE :itemname " +
+            "AND i.location LIKE :location " +
+            "AND (:category IS NULL OR i.category = :category)")
+
     List<ItemDB> getByNameLocationAndCategory(
             @Param("itemname") String itemname,
             @Param("location") String location,
