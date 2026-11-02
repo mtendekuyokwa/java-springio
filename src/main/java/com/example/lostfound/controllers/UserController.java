@@ -5,11 +5,15 @@ import com.example.lostfound.LostAndFoundException;
 import com.example.lostfound.db.UserDB;
 import com.example.lostfound.dto.GeneralResponseDTO;
 import com.example.lostfound.dto.UserDTO;
+import com.example.lostfound.dto.validation.OnCreate;
+import com.example.lostfound.dto.validation.OnUpdate;
 import com.example.lostfound.repository.UserRepository;
 import com.example.lostfound.services.Utils;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -20,9 +24,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     @PostMapping("/")
-    ResponseEntity<GeneralResponseDTO<UserDTO>> addUser(@RequestBody UserDB userDB) {
+    ResponseEntity<GeneralResponseDTO<UserDTO>> addUser(@Validated(OnCreate.class) @RequestBody UserDTO user) {
         try {
-            var newuser=userRepository.save(userDB);
+            var newuser=userRepository.save(new UserDB(user.getUsername(),user.getPassword()));
             var addedNewUser=userRepository.existsById(newuser.getId());
             if (addedNewUser) {
                 return ResponseEntity.status(HttpStatus.CREATED).body(new GeneralResponseDTO<>(HttpStatus.CREATED, AppStrings.userCreated,new UserDTO(newuser.getUsername(),newuser.getId())));
@@ -30,14 +34,14 @@ public class UserController {
             }
         }
         catch (Exception e) {
-            throw new LostAndFoundException(e.getMessage());
+            throw new LostAndFoundException(AppStrings.failedToCreate);
 
         }
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new GeneralResponseDTO<>(HttpStatus.CONFLICT, AppStrings.failedToCreate, null));
     }
 @PutMapping("/{id}")
-ResponseEntity<GeneralResponseDTO<UserDTO>> updateUser(@PathVariable Long id, @RequestBody UserDB userDB) {
+ResponseEntity<GeneralResponseDTO<UserDTO>> updateUser(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody UserDTO userDB) {
 
             var user=userRepository.findById(id).map(existingProduct->{
                 existingProduct.setUsername(userDB.getUsername());

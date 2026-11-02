@@ -42,7 +42,7 @@ public class ItemController {
         }
         catch (Exception e) {
 
-            throw new Throwable(e.getMessage());
+            throw new LostAndFoundException(AppStrings.failedToCreate);
         }
 
     }

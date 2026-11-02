@@ -4,6 +4,7 @@ import com.example.lostfound.dto.GeneralResponseDTO;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,13 +31,13 @@ public class LostAndFoundExceptionHandler {
         return new ResponseEntity<>(errorBody, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({Exception.class, Throwable.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GeneralResponseDTO<Object>> handleGeneralException(Throwable ex) {
         var errorBody = new GeneralResponseDTO<>(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage() ,
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage().split(";")[ex.getMessage().split(";").length-1].split("\\[")[1].split("\\]")[0],
                 null
         );
-        return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorBody, HttpStatus.BAD_REQUEST);
     }
 }
