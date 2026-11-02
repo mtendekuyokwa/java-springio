@@ -17,4 +17,5 @@ public class AppStrings {
     public static String deleteConfirmed="delete confirmed";
     public static String failetoPatch="failed to patch";
     public static String dataUpated="data updated";
+    public static String failedToSearch="failed to search";
 }

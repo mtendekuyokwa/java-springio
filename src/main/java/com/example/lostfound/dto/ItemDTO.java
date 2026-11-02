@@ -71,4 +71,7 @@ public class ItemDTO {
         this.userid = userid;
         this.category = category;
     }
+
+//TODO: exponse recovery status
 }
+

@@ -3,6 +3,7 @@ package com.example.lostfound.controllers;
 //import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import com.example.lostfound.AppStrings;
 import com.example.lostfound.LostAndFoundException;
+import com.example.lostfound.db.Category;
 import com.example.lostfound.db.ItemDB;
 import com.example.lostfound.db.RecoveryStatus;
 import com.example.lostfound.dto.GeneralResponseDTO;
@@ -12,6 +13,7 @@ import com.example.lostfound.dto.validation.OnCreate;
 import com.example.lostfound.repository.ItemRepository;
 import com.example.lostfound.repository.UserRepository;
 import com.example.lostfound.services.Utils;
+import com.sun.net.httpserver.HttpsConfigurator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +70,22 @@ return item;
             throw new LostAndFoundException(AppStrings.failetoPatch);
         }
     }
-    
+
+    @GetMapping("search/")
+    public ResponseEntity<GeneralResponseDTO<List<ItemDB>>> searchItem(
+            @RequestParam(defaultValue = "%") String location,
+            @RequestParam(defaultValue = "%") Category category,
+            @RequestParam (defaultValue = "%") String name
+    ){
+try {
+    //TODO: convert the itemdb to itemdto
+var items=itemRepository.getByNameLocationAndCategory(name,location,(Category) category);
+return Utils.returnResponse(HttpStatus.OK,items,AppStrings.allItemsRetrieved);
+}
+catch (Exception e) {
+    throw new LostAndFoundException(AppStrings.failedToSearch);
+}
+    }
     @PostMapping("/")
     public ResponseEntity<GeneralResponseDTO<ItemDB>> addItem(@Validated(OnCreate.class) @RequestBody ItemDTO item) {
         if (!userRepository.existsById(item.getUserid())){
