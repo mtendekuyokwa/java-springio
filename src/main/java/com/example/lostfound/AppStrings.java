@@ -18,4 +18,7 @@ public class AppStrings {
     public static String failetoPatch="failed to patch";
     public static String dataUpated="data updated";
     public static String failedToSearch="failed to search";
+    public static String failedToGetItem="failed to get item";
+    public static String itemFound="item found";
+    public static String itemNotFound="item not found";
 }

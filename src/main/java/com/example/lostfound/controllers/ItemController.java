@@ -21,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/item")
@@ -30,7 +31,21 @@ public class ItemController {
     private ItemRepository itemRepository;
     @Autowired
     private UserRepository userRepository;
-
+ @GetMapping("/{id}")
+ public ResponseEntity<GeneralResponseDTO<ItemDB>> getItem(@PathVariable Long id){
+     try {
+var item=itemRepository.findById(id);
+if (item.isPresent()) {
+    return Utils.returnResponse(HttpStatus.OK,item.get(),AppStrings.itemFound);
+}
+else {
+    return Utils.returnResponse(HttpStatus.CONFLICT,null,AppStrings.itemNotFound);
+}
+     }
+     catch (Exception e){
+         throw new LostAndFoundException(AppStrings.failedToGetItem);
+     }
+ }
     @GetMapping("/all")
     public ResponseEntity<GeneralResponseDTO<List<ItemDTO>>> getItems(){
         try {
@@ -45,7 +60,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<GeneralResponseDTO<List<ItemDTO>>> getItem(@PathVariable Long id){
+    public ResponseEntity<GeneralResponseDTO<List<ItemDTO>>> deleteItem(@PathVariable Long id){
         try {
             itemRepository.deleteById(id);
             return Utils.returnResponse(HttpStatus.OK,null,AppStrings.deleteConfirmed);
@@ -56,6 +71,7 @@ public class ItemController {
         }
 
     }
+
     @PutMapping("/{id}/recover")
     public ResponseEntity<GeneralResponseDTO<ItemDTO>> modifyItem(@PathVariable Long id, @RequestBody RecoveryDTO recoveryStatus){
         try {
@@ -109,5 +125,6 @@ catch (Exception e) {
         }
 
     }
+
 
 }
