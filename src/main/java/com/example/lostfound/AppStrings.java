@@ -12,4 +12,7 @@ public class AppStrings {
     public static String userUpdated="user updated";
     public static String userNotFound="user not found";
     public static String failedToDelete="failed to delete";
+    public static String failedToGetAll="failed to get all";
+    public static String allItemsRetrieved="all items retrieved";
+    public static String deleteConfirmed="delete confirmed";
 }

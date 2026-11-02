@@ -1,5 +1,6 @@
 package com.example.lostfound.dto;
 
+import com.example.lostfound.db.Category;
 import com.example.lostfound.db.LOSTSTATUS;
 import com.example.lostfound.dto.validation.OnCreate;
 import com.example.lostfound.dto.validation.OnUpdate;
@@ -24,8 +25,14 @@ public class ItemDTO {
     @NotBlank(message = "location not set",groups = {OnCreate.class})
     @Size(min = 2,max=150,groups =  {OnCreate.class,OnUpdate.class})
     String location;
+    @NotNull(message ="category not set", groups = {OnCreate.class})
+    Category category;
 
     Long userid;
+
+    public Category getCategory() {
+        return category;
+    }
 
     public Long getUserid() {
         return userid;
@@ -53,5 +60,15 @@ public class ItemDTO {
 
     public LOSTSTATUS getItemStatus() {
         return itemStatus;
+    }
+
+    public ItemDTO(String name, Long id, String description, LOSTSTATUS itemStatus, String location, Long userid, Category category) {
+        this.name = name;
+        this.id = id;
+        this.description = description;
+        this.itemStatus = itemStatus;
+        this.location = location;
+        this.userid = userid;
+        this.category = category;
     }
 }

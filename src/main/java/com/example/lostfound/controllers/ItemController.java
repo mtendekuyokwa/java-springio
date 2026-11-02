@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/item")
 public class ItemController {
@@ -25,9 +27,30 @@ public class ItemController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/")
-    public ResponseEntity<String> getSomething(){
-        return ResponseEntity.ok().body("I am ok");
+    @GetMapping("/all")
+    public ResponseEntity<GeneralResponseDTO<List<ItemDTO>>> getItems(){
+        try {
+            var allItems = itemRepository.findAll().stream().map(item -> new ItemDTO(item.getItemName(),item.getId(),item.getDescription(),item.getItemStatus(),item.getLocation(),item.getUserid(),item.getCategory())).toList();
+            return Utils.returnResponse(HttpStatus.OK,allItems,AppStrings.allItemsRetrieved);
+
+        }
+        catch (Exception e) {
+            throw  new LostAndFoundException(AppStrings.failedToGetAll);
+        }
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GeneralResponseDTO<List<ItemDTO>>> getItem(@PathVariable Long id){
+        try {
+            itemRepository.deleteById(id);
+            return Utils.returnResponse(HttpStatus.OK,null,AppStrings.deleteConfirmed);
+
+        }
+        catch (Exception e) {
+            throw  new LostAndFoundException(AppStrings.failedToDelete);
+        }
+
     }
     
     @PostMapping("/")
@@ -36,7 +59,7 @@ public class ItemController {
             throw new LostAndFoundException(AppStrings.userNotFound);
         }
         try {
-          var newItem=  itemRepository.save(new ItemDB(item.getItemStatus(),item.getDescription(),item.getLocation(),item.getName(),item.getUserid()));
+          var newItem=  itemRepository.save(new ItemDB(item.getItemStatus(),item.getDescription(),item.getLocation(),item.getName(),item.getUserid(),item.getCategory()));
            var getItemFromDB=itemRepository.existsById(newItem.getId());
            if (getItemFromDB) {
                return Utils.returnResponse(HttpStatus.CREATED,newItem,AppStrings.itemCreated);
@@ -53,4 +76,5 @@ public class ItemController {
         }
 
     }
+
 }
