@@ -1,0 +1,445 @@
+{
+  "info": {
+    "name": "Lost & Found API",
+    "description": "Every endpoint in ItemController and UserController.\n\nRun the whole collection top to bottom (Runner) or one request at a time. \"Create User\" saves `userId` and \"Create Item\" saves `itemId` as collection variables, so the later requests use them automatically.\n\nBase URL defaults to http://localhost:4423 (server.port in application.properties).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4423" },
+    { "key": "userId", "value": "1" },
+    { "key": "itemId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.id) {",
+                  "    pm.collectionVariables.set('userId', body.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"janebanda\",\n  \"password\": \"StrongPass#1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", ""]
+            },
+            "description": "Trailing slash is required: the mapping is @PostMapping(\"/\")."
+          }
+        },
+        {
+          "name": "Create User - validation error (short password)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"j\",\n  \"password\": \"short\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", ""]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('302 Found (controller returns HttpStatus.FOUND)', () => pm.response.to.have.status(302));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane.banda\",\n  \"password\": \"NewStrongPass#2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "Create Item (LOST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "if (body.data && body.data.id) {",
+                  "    pm.collectionVariables.set('itemId', body.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Samsung Phone\",\n  \"description\": \"Black Samsung A54 with a cracked screen protector\",\n  \"itemStatus\": \"LOST\",\n  \"location\": \"Library 2nd floor\",\n  \"category\": \"ELECTRONICS\",\n  \"userid\": {{userId}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", ""]
+            },
+            "description": "itemStatus: LOST | FOUND\ncategory: ELECTRONICS | FOOD | OTHER\nuserid must belong to an existing user."
+          }
+        },
+        {
+          "name": "Create Item (FOUND)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Water Bottle\",\n  \"description\": \"Blue steel water bottle with stickers on it\",\n  \"itemStatus\": \"FOUND\",\n  \"location\": \"Cafeteria\",\n  \"category\": \"OTHER\",\n  \"userid\": {{userId}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Item - unknown user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laptop Charger\",\n  \"description\": \"Dell 65W charger left in lecture hall\",\n  \"itemStatus\": \"FOUND\",\n  \"location\": \"Hall B\",\n  \"category\": \"ELECTRONICS\",\n  \"userid\": 999999\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", ""]
+            }
+          }
+        },
+        {
+          "name": "Create Item - validation error",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ab\",\n  \"description\": \"short\",\n  \"location\": \"X\",\n  \"userid\": {{userId}}\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", ""]
+            }
+          }
+        },
+        {
+          "name": "Get All Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "all"]
+            }
+          }
+        },
+        {
+          "name": "Get Item by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "{{itemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search - no filters (everything)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "search"]
+            }
+          }
+        },
+        {
+          "name": "Search - by name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/search?name=%25Phone%25",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "search"],
+              "query": [{ "key": "name", "value": "%25Phone%25", "description": "SQL LIKE pattern. %25 is an encoded %, so this means \"contains Phone\". Case-sensitive." }]
+            }
+          }
+        },
+        {
+          "name": "Search - by category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/search?category=ELECTRONICS",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "search"],
+              "query": [{ "key": "category", "value": "ELECTRONICS", "description": "ELECTRONICS | FOOD | OTHER | ALL" }]
+            }
+          }
+        },
+        {
+          "name": "Search - by location",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/search?location=%25Library%25",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "search"],
+              "query": [{ "key": "location", "value": "%25Library%25" }]
+            }
+          }
+        },
+        {
+          "name": "Search - name + category + location",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/search?name=%25Phone%25&category=ELECTRONICS&location=%25Library%25",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "search"],
+              "query": [
+                { "key": "name", "value": "%25Phone%25" },
+                { "key": "category", "value": "ELECTRONICS" },
+                { "key": "location", "value": "%25Library%25" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Recover Item (RECOVERED)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryStatus\": \"RECOVERED\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/{{itemId}}/recover",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "{{itemId}}", "recover"]
+            },
+            "description": "recoveryStatus: RECOVERED | UNRECOVERED"
+          }
+        },
+        {
+          "name": "Recover Item (back to UNRECOVERED)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryStatus\": \"UNRECOVERED\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/item/{{itemId}}/recover",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "{{itemId}}", "recover"]
+            }
+          }
+        },
+        {
+          "name": "Delete Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "{{itemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Item by ID - after delete (not found)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/item/{{itemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["item", "{{itemId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('202 Accepted', () => pm.response.to.have.status(202));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
